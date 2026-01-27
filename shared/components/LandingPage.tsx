@@ -14,7 +14,7 @@ export default function LandingPage() {
   // 1. Setup Image Loading
   const { images, isLoading, progress } = useImagePreloader(
     FRAME_COUNT,
-    (index) => `/frames/ezgif-frame-${index.toString().padStart(3, "0")}.jpg`
+    (index) => `/sequence2/ezgif-frame-${index.toString().padStart(3, "0")}.jpg`
   );
 
   // 2. Scroll Hooks
@@ -47,7 +47,7 @@ export default function LandingPage() {
       </AnimatePresence>
 
       {/* Main Scroll Container */}
-      <div ref={containerRef} className="relative h-[600vh] bg-[#0F1110]">
+      <div ref={containerRef} className="relative h-[600vh] bg-[#F2F0E9]">
         {/* The Visuals */}
         <ScrollCanvas
           scrollProgress={scrollYProgress}
