@@ -9,7 +9,7 @@ import ScrollCanvas from "@/shared/components/ScrollCanvas";
 const FRAME_COUNT = 120;
 
 export default function LandingPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null); // container ref
 
   // 1. Setup Image Loading
   const { images, isLoading, progress } = useImagePreloader(
