@@ -1,24 +1,51 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { LayoutGroup, useReducedMotion } from "motion/react";
+import { useCallback, useMemo, useState } from "react";
+import { Hero } from "@/components/hero";
+import { PortfolioNavbar } from "@/components/navbar";
+import { PortfolioLoader } from "@/components/portfolio-loader";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 function Home() {
+  const prefersReducedMotion = useReducedMotion();
+  const [loaderFinished, setLoaderFinished] = useState(false);
+  const [liftOffStarted, setLiftOffStarted] = useState(false);
+
+  const showNavbarName = useMemo(
+    () => prefersReducedMotion || liftOffStarted || loaderFinished,
+    [liftOffStarted, loaderFinished, prefersReducedMotion],
+  );
+
+  const handleLiftOff = useCallback(() => {
+    setLiftOffStarted(true);
+  }, []);
+
+  const handleLoaderFinished = useCallback(() => {
+    setLoaderFinished(true);
+  }, []);
+
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background p-8">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold tracking-tight text-foreground">
-          Hello World
-        </h1>
+    <LayoutGroup id="portfolio-loader-sequence">
+      <div className="relative min-h-svh overflow-hidden bg-background">
+        <PortfolioNavbar
+          show={loaderFinished || liftOffStarted || prefersReducedMotion}
+          showName={showNavbarName}
+          useSharedName={!prefersReducedMotion}
+        />
 
-        <p className="mt-4 text-muted-foreground">
-          Plus Jakarta Sans · Zen Inspired
-        </p>
+        <Hero show={loaderFinished || prefersReducedMotion} />
 
-        <Button className="mt-8">Test Theme</Button>
+        {!loaderFinished ? (
+          <PortfolioLoader
+            isReducedMotion={prefersReducedMotion}
+            onLiftOff={handleLiftOff}
+            onFinished={handleLoaderFinished}
+          />
+        ) : null}
       </div>
-    </main>
+    </LayoutGroup>
   );
 }
