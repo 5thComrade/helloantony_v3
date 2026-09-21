@@ -1,9 +1,11 @@
+import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 
 type PortfolioNavbarProps = {
   show: boolean;
   showName: boolean;
   useSharedName: boolean;
+  nameTo?: string;
 };
 
 const FULL_NAME = "ANTONY CHIRAMEL";
@@ -12,7 +14,27 @@ export function PortfolioNavbar({
   show,
   showName,
   useSharedName,
+  nameTo,
 }: Readonly<PortfolioNavbarProps>) {
+  const nameContent = useSharedName ? (
+    <motion.span
+      layoutId="portfolio-name"
+      className="block truncate text-sm font-semibold uppercase tracking-[0.12em] text-foreground sm:text-base"
+      transition={{
+        type: "spring",
+        stiffness: 280,
+        damping: 28,
+        mass: 0.9,
+      }}
+    >
+      {FULL_NAME}
+    </motion.span>
+  ) : (
+    <span className="block truncate text-sm font-semibold uppercase tracking-[0.12em] text-foreground sm:text-base">
+      {FULL_NAME}
+    </span>
+  );
+
   return (
     <motion.header
       className="fixed inset-x-0 top-0 z-40"
@@ -25,23 +47,12 @@ export function PortfolioNavbar({
 
         <div className="min-w-0">
           {showName ? (
-            useSharedName ? (
-              <motion.span
-                layoutId="portfolio-name"
-                className="block truncate text-sm font-semibold uppercase tracking-[0.12em] text-foreground sm:text-base"
-                transition={{
-                  type: "spring",
-                  stiffness: 280,
-                  damping: 28,
-                  mass: 0.9,
-                }}
-              >
-                {FULL_NAME}
-              </motion.span>
+            nameTo ? (
+              <Link to={nameTo} className="focus-visible:outline-none">
+                {nameContent}
+              </Link>
             ) : (
-              <span className="block truncate text-sm font-semibold uppercase tracking-[0.12em] text-foreground sm:text-base">
-                {FULL_NAME}
-              </span>
+              nameContent
             )
           ) : null}
         </div>

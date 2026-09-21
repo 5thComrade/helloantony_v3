@@ -1,22 +1,25 @@
 import { motion } from "motion/react";
+import { Button } from "@/components/ui/button";
 
 type HeroProps = {
-  show: boolean;
+  onAsk: () => void;
 };
 
-export function Hero({ show }: Readonly<HeroProps>) {
+export function Hero({ onAsk }: Readonly<HeroProps>) {
   return (
     <motion.main
       className="relative z-10 mx-auto flex min-h-svh w-full max-w-6xl flex-col justify-center px-6 pb-16 pt-32 md:px-10 md:pt-36"
-      initial={false}
-      animate={{ opacity: show ? 1 : 0 }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -18 }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
     >
       <motion.section
         className="max-w-3xl"
-        initial={false}
-        animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-        transition={{ duration: 0.8, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -12 }}
+        transition={{ duration: 0.75, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
       >
         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
           Software Engineer
@@ -30,6 +33,22 @@ export function Hero({ show }: Readonly<HeroProps>) {
           Building intentional digital products with strong engineering
           foundations, refined interactions, and modern web performance.
         </p>
+
+        <motion.div
+          className="mt-10"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Button
+            size="lg"
+            className="rounded-full px-5 text-sm tracking-[0.04em]"
+            onClick={onAsk}
+          >
+            Ask me anything
+          </Button>
+        </motion.div>
       </motion.section>
     </motion.main>
   );

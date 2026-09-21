@@ -1,17 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LayoutGroup, useReducedMotion } from "motion/react";
 import { useCallback, useMemo, useState } from "react";
 import { Hero } from "@/components/hero";
 import { PortfolioNavbar } from "@/components/navbar";
 import { PortfolioLoader } from "@/components/portfolio-loader";
 
+let hasSeenPortfolioLoaderInApp = false;
+
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 function Home() {
-  const prefersReducedMotion = useReducedMotion();
-  const [loaderFinished, setLoaderFinished] = useState(false);
+  const navigate = useNavigate();
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const [loaderFinished, setLoaderFinished] = useState(
+    hasSeenPortfolioLoaderInApp,
+  );
   const [liftOffStarted, setLiftOffStarted] = useState(false);
 
   const showNavbarName = useMemo(
@@ -24,8 +29,13 @@ function Home() {
   }, []);
 
   const handleLoaderFinished = useCallback(() => {
+    hasSeenPortfolioLoaderInApp = true;
     setLoaderFinished(true);
   }, []);
+
+  const handleOpenChat = useCallback(() => {
+    void navigate({ to: "/chat" });
+  }, [navigate]);
 
   return (
     <LayoutGroup id="portfolio-loader-sequence">
@@ -36,7 +46,7 @@ function Home() {
           useSharedName={!prefersReducedMotion}
         />
 
-        <Hero show={loaderFinished || prefersReducedMotion} />
+        <Hero onAsk={handleOpenChat} />
 
         {!loaderFinished ? (
           <PortfolioLoader
