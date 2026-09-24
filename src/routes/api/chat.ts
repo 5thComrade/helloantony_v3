@@ -2,6 +2,34 @@ import { createFileRoute } from "@tanstack/react-router";
 import { groq } from "@/lib/ai/groq";
 import { getKnowledge } from "@/lib/ai/knowledge";
 
+function normalizeAssistantContent(content: unknown): string {
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (
+          part &&
+          typeof part === "object" &&
+          "type" in part &&
+          part.type === "text" &&
+          "text" in part &&
+          typeof part.text === "string"
+        ) {
+          return part.text;
+        }
+
+        return "";
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  return "";
+}
+
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
@@ -56,8 +84,9 @@ ${knowledge}
           ],
         });
 
+        const rawAnswer = completion.choices[0]?.message?.content;
         const answer =
-          completion.choices[0]?.message?.content ??
+          normalizeAssistantContent(rawAnswer).trim() ||
           "I don't have enough information to answer that.";
 
         return new Response(JSON.stringify({ answer }), {

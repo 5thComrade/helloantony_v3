@@ -1,6 +1,8 @@
 import { ArrowUpIcon, CaretLeftIcon, CoffeeIcon } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,8 +16,8 @@ type ChatMessage = {
 };
 
 const STARTER_PROMPTS = [
-  "Tell me about Antony's recent engineering focus.",
-  "What kind of projects has Antony worked on?",
+  "How did Antony build this portfolio?",
+  "Why should I hire Antony?",
   "What technologies does Antony prefer?",
 ];
 
@@ -25,6 +27,42 @@ function createMessage(role: MessageRole, content: string): ChatMessage {
     role,
     content,
   };
+}
+
+function normalizeAssistantAnswer(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((part) => {
+        if (
+          part &&
+          typeof part === "object" &&
+          "type" in part &&
+          part.type === "text" &&
+          "text" in part &&
+          typeof part.text === "string"
+        ) {
+          return part.text;
+        }
+
+        return "";
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  if (value == null) {
+    return "";
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
 }
 
 export function ChatWindow() {
@@ -98,11 +136,13 @@ export function ChatWindow() {
     };
   }, [messages, scrollToEnd, updateScrollState]);
 
+  const isBusy = isLoading;
+
   const submitPrompt = useCallback(
     async (input: string) => {
       const trimmed = input.trim();
 
-      if (!trimmed || isLoading) {
+      if (!trimmed || isBusy) {
         return;
       }
 
@@ -121,21 +161,29 @@ export function ChatWindow() {
         });
 
         const payload = (await response.json()) as {
-          answer?: string;
-          error?: string;
+          answer?: unknown;
+          error?: unknown;
         };
 
+        const normalizedAnswer = normalizeAssistantAnswer(
+          payload.answer,
+        ).trim();
+
         if (!response.ok) {
-          throw new Error(
-            payload.error || "Unable to fetch an answer right now.",
-          );
+          const errorMessage =
+            typeof payload.error === "string"
+              ? payload.error
+              : "Unable to fetch an answer right now.";
+
+          throw new Error(errorMessage);
         }
 
         setMessages((prev) => [
           ...prev,
           createMessage(
             "assistant",
-            payload.answer || "I don't have enough information to answer that.",
+            normalizedAnswer ||
+              "I don't have enough information to answer that.",
           ),
         ]);
       } catch (error) {
@@ -149,7 +197,7 @@ export function ChatWindow() {
         setIsLoading(false);
       }
     },
-    [isLoading],
+    [isBusy],
   );
 
   const handleSubmit = useCallback(
@@ -243,7 +291,92 @@ export function ChatWindow() {
                           : "rounded-bl-md bg-background/70 text-foreground backdrop-blur-sm"
                       }`}
                     >
-                      {message.content}
+                      {isUser ? (
+                        message.content
+                      ) : (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => (
+                              <p className="mb-3 last:mb-0">{children}</p>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="mb-3 list-disc space-y-1 pl-5 last:mb-0">
+                                {children}
+                              </ul>
+                            ),
+                            ol: ({ children }) => (
+                              <ol className="mb-3 list-decimal space-y-1 pl-5 last:mb-0">
+                                {children}
+                              </ol>
+                            ),
+                            li: ({ children }) => <li>{children}</li>,
+                            strong: ({ children }) => (
+                              <strong className="font-semibold">
+                                {children}
+                              </strong>
+                            ),
+                            em: ({ children }) => (
+                              <em className="italic">{children}</em>
+                            ),
+                            code: ({ children }) => (
+                              <code className="rounded bg-foreground/10 px-1.5 py-0.5 text-[0.9em]">
+                                {children}
+                              </code>
+                            ),
+                            h1: ({ children }) => (
+                              <h3 className="mb-2 text-base font-semibold last:mb-0">
+                                {children}
+                              </h3>
+                            ),
+                            h2: ({ children }) => (
+                              <h4 className="mb-2 text-sm font-semibold last:mb-0">
+                                {children}
+                              </h4>
+                            ),
+                            h3: ({ children }) => (
+                              <h5 className="mb-2 text-sm font-semibold last:mb-0">
+                                {children}
+                              </h5>
+                            ),
+                            table: ({ children }) => (
+                              <div className="mb-3 overflow-x-auto rounded-lg border border-border/50 last:mb-0">
+                                <table className="w-full min-w-md border-collapse text-left text-[0.9rem]">
+                                  {children}
+                                </table>
+                              </div>
+                            ),
+                            thead: ({ children }) => (
+                              <thead className="bg-foreground/5">
+                                {children}
+                              </thead>
+                            ),
+                            tbody: ({ children }) => (
+                              <tbody className="divide-y divide-border/40">
+                                {children}
+                              </tbody>
+                            ),
+                            tr: ({ children }) => (
+                              <tr className="align-top">{children}</tr>
+                            ),
+                            th: ({ children }) => (
+                              <th className="px-3 py-2 font-semibold">
+                                {children}
+                              </th>
+                            ),
+                            td: ({ children }) => (
+                              <td className="px-3 py-2">{children}</td>
+                            ),
+                            blockquote: ({ children }) => (
+                              <blockquote className="mb-3 border-l-2 border-foreground/20 pl-3 italic last:mb-0">
+                                {children}
+                              </blockquote>
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      )}
                     </motion.article>
                   </motion.div>
                 );
@@ -276,11 +409,11 @@ export function ChatWindow() {
                   type="button"
                   size="xs"
                   variant="outline"
-                  className="rounded-full"
+                  className="rounded-full cursor-pointer"
                   onClick={() => {
                     void submitPrompt(starter);
                   }}
-                  disabled={isLoading}
+                  disabled={isBusy}
                 >
                   {starter}
                 </Button>
@@ -294,8 +427,8 @@ export function ChatWindow() {
 
               <Textarea
                 id="chat-prompt-input"
-                className="min-h-11 max-h-40 w-full resize-y rounded-2xl border border-border/60 bg-background/65 px-4 py-3 text-sm leading-relaxed text-foreground"
-                placeholder="Ask about Antony's work, projects, or experience..."
+                className="min-h-11 max-h-40 w-full resize-y rounded-2xl border border-border/90 bg-background/95 px-4 py-3 text-sm leading-relaxed text-foreground shadow-sm ring-1 ring-foreground/10 transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/90 focus-visible:border-primary/70 focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary/35"
+                placeholder="How can I contact Antony?"
                 value={prompt}
                 onChange={(event) => {
                   setPrompt(event.target.value);
@@ -306,7 +439,7 @@ export function ChatWindow() {
                     void submitPrompt(prompt);
                   }
                 }}
-                disabled={isLoading}
+                disabled={isBusy}
               />
 
               <Button
@@ -315,9 +448,9 @@ export function ChatWindow() {
                 variant="outline"
                 aria-label="Send message"
                 className="h-12 w-12 cursor-pointer"
-                disabled={isLoading || !prompt.trim()}
+                disabled={isBusy || !prompt.trim()}
               >
-                {isLoading ? "..." : <ArrowUpIcon size={40} />}
+                {isBusy ? "..." : <ArrowUpIcon size={40} />}
               </Button>
             </form>
           </div>
