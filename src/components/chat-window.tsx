@@ -221,16 +221,16 @@ export function ChatWindow() {
       <section className="relative mx-auto flex h-full w-full max-w-4xl flex-col px-4 pb-5 pt-20 md:px-6 md:pb-7">
         <div className="pb-3 flex items-center gap-4">
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon-lg"
-            aria-label="Submit"
-            className="cursor-pointer"
+            aria-label="Go back"
+            className="hidden cursor-pointer md:inline-flex"
             onClick={() => window.history.back()}
           >
             <CaretLeftIcon />
           </Button>
 
-          <div>
+          <div className="hidden md:block">
             <p className="text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
               Chat with Antony's Portfolio
             </p>

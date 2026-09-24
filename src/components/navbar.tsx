@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { motion } from "motion/react";
 
 type PortfolioNavbarProps = {
@@ -16,6 +16,10 @@ export function PortfolioNavbar({
   useSharedName,
   nameTo,
 }: Readonly<PortfolioNavbarProps>) {
+  const isChatRoute = useRouterState({
+    select: (state) => state.location.pathname.startsWith("/chat"),
+  });
+
   const nameContent = useSharedName ? (
     <motion.span
       layoutId="portfolio-name"
@@ -37,7 +41,9 @@ export function PortfolioNavbar({
 
   return (
     <motion.header
-      className="fixed inset-x-0 top-0 z-40"
+      className={`fixed inset-x-0 top-0 z-40 ${
+        isChatRoute ? "bg-transparent" : "bg-background/95 backdrop-blur-sm"
+      }`}
       initial={false}
       animate={{ opacity: show ? 1 : 0 }}
       transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
