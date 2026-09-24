@@ -59,7 +59,7 @@ export const Route = createFileRoute("/api/chat")({
           const groq = getGroqClient();
 
           console.log("Reading knowledge...");
-          const knowledge = await getKnowledge();
+          const knowledge = getKnowledge();
           console.log("Knowledge loaded:", knowledge.length, "characters");
 
           console.log("Calling Groq...");
