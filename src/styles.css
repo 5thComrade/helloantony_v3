@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&family=Shantell+Sans:ital,wght@0,400..700;1,400..700&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -190,5 +190,137 @@
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
+  }
+}
+
+/* neat-annotations inspired setup, tuned for CTA usage with no marker background */
+.ann {
+  --ann-color: light-dark(#7f7a78, #b8b8bd);
+  --ann-mark: transparent;
+  --ann-font: "Shantell Sans", cursive;
+  --ann-target-gap: 5px;
+  --ann-label-gap: 6px;
+  --ann-label-max-width: 150px;
+  --ann-arrow-x: 0px;
+  --ann-text-x: 0px;
+  --ann-arrow-y: 0px;
+  --ann-text-y: 0px;
+  --ann-rotate: -4deg;
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+  line-height: 1.15;
+}
+
+.ann::after {
+  content: attr(data-note);
+  position: absolute;
+  z-index: 4;
+  width: max-content;
+  max-width: var(--ann-label-max-width);
+  transform: rotate(var(--ann-rotate));
+  font-family: var(--ann-font);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--ann-color);
+  opacity: 0.95;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+
+.ann::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  width: 46px;
+  height: 38px;
+  transform-origin: 50% 50%;
+  -webkit-mask: var(--_ann-arrow-mask) center / contain no-repeat;
+  mask: var(--_ann-arrow-mask) center / contain no-repeat;
+  background: var(--ann-color);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.ann:not([data-note])::before,
+.ann:not([data-note])::after,
+.ann[data-note=""]::before,
+.ann[data-note=""]::after {
+  display: none;
+}
+
+.ann-no-mark {
+  --ann-mark: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Right-side annotation: arrow points from right to left toward the target. */
+.ann-w::before {
+  left: calc(100% + var(--ann-target-gap) - 3px + var(--ann-arrow-x));
+  top: calc(50% - 19px + var(--ann-arrow-y));
+  --_ann-arrow-mask: url("data:image/svg+xml,%3Csvg width='46' height='38' viewBox='0 0 46 38' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M43 22 C32 18 15 18 3 19' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M10 13 L3 19 L10 25' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.ann-w::after {
+  left: calc(
+    100% + var(--ann-target-gap) + 40px + var(--ann-label-gap) +
+      var(--ann-text-x)
+  );
+  top: calc(50% - 5px + var(--ann-text-y));
+  transform: translateY(-30%) rotate(var(--ann-rotate));
+}
+
+.ann-hero-cta {
+  --ann-color: light-dark(#6f6a68, #c3c3ca);
+  --ann-target-gap: 8px;
+  --ann-arrow-x: -2px;
+  --ann-arrow-y: 0px;
+  --ann-text-x: -3px;
+  --ann-text-y: 0px;
+  --ann-rotate: -6deg;
+}
+
+.ann-hero-cta::before {
+  animation: ann-arrow-tick 1.1s ease-in-out infinite;
+}
+
+.ann-hero-cta::after {
+  animation: ann-label-float 1.8s ease-in-out infinite;
+}
+
+@keyframes ann-arrow-tick {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: -1.3px 0.5px;
+  }
+}
+
+@keyframes ann-label-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -2px;
+  }
+}
+
+@media (max-width: 639px) {
+  .ann-hero-cta::before,
+  .ann-hero-cta::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ann-hero-cta::before,
+  .ann-hero-cta::after {
+    animation: none;
   }
 }

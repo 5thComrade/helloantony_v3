@@ -41,12 +41,12 @@ const CORE_SKILLS = [
     items: ["TypeScript", "JavaScript"],
   },
   {
-    category: "Backend",
-    items: ["Node.js", "PostgreSQL", "Next.js"],
+    category: "Frameworks",
+    items: ["React.js", "Tanstack Start", "Next.js"],
   },
   {
-    category: "Cloud",
-    items: ["AWS", "Docker"],
+    category: "Backend",
+    items: ["Node.js", "AWS", "PostgreSQL"],
   },
 ];
 
@@ -125,13 +125,34 @@ export function Hero({ onAsk }: Readonly<HeroProps>) {
             <LinkedinLogoIcon size={18} />
           </motion.a>
 
-          <Button
-            size="lg"
-            className="rounded-full px-5 text-sm tracking-[0.04em] cursor-pointer"
-            onClick={onAsk}
+          <motion.div
+            className="relative inline-flex items-center"
+            initial={{ opacity: 0, x: 4, y: -3, rotate: -2 }}
+            animate={{
+              opacity: 1,
+              x: 0,
+              y: 0,
+              rotate: 0,
+            }}
+            transition={{
+              duration: 0.55,
+              delay: 0.34,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
-            Ask me anything
-          </Button>
+            <span
+              data-note="click me"
+              className="ann ann-w ann-no-mark ann-hero-cta"
+            >
+              <Button
+                size="lg"
+                className="relative z-10 cursor-pointer rounded-full px-5 text-sm tracking-[0.04em]"
+                onClick={onAsk}
+              >
+                Ask me anything
+              </Button>
+            </span>
+          </motion.div>
         </motion.div>
 
         <motion.div
@@ -156,7 +177,7 @@ export function Hero({ onAsk }: Readonly<HeroProps>) {
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-[0.96rem]">
               I am currently a Software Engineer II at Neeve.ai, where I helped
-              lead the development of Neeve Portal, a unified platform providing
+              lead the development of Neeve Portal, a platform providing
               zero-trust remote access to operational technology (OT) devices
               and endpoints.
             </p>

@@ -277,7 +277,7 @@ export function ChatWindow() {
                   >
                     {isUser ? null : (
                       <span
-                        className="mt-2 mr-4 shrink-0 text-foreground"
+                        className="mt-2 shrink-0 text-foreground"
                         aria-hidden
                       >
                         <CoffeeIcon size={32} weight="duotone" />
@@ -390,7 +390,7 @@ export function ChatWindow() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                   >
-                    Thinking...
+                    Antony is typing...
                   </motion.div>
                 ) : null}
               </AnimatePresence>
