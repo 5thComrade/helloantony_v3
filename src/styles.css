@@ -195,7 +195,7 @@
 
 /* neat-annotations inspired setup, tuned for CTA usage with no marker background */
 .ann {
-  --ann-color: light-dark(#7f7a78, #b8b8bd);
+  --ann-color: var(--muted-foreground);
   --ann-mark: transparent;
   --ann-font: "Shantell Sans", cursive;
   --ann-target-gap: 5px;
@@ -274,7 +274,7 @@
 }
 
 .ann-hero-cta {
-  --ann-color: light-dark(#6f6a68, #c3c3ca);
+  --ann-color: var(--muted-foreground);
   --ann-target-gap: 8px;
   --ann-arrow-x: -2px;
   --ann-arrow-y: 0px;
